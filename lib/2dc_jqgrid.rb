@@ -169,7 +169,7 @@ module Jqgrid
       search = ""
       filter_toolbar = ""
       if options[:search] == 'true'
-        search = %Q/.navButtonAdd("##{id}_pager",{caption:"",title:$.jgrid.nav.searchtitle, buttonicon :'ui-icon-search', onClickButton:function(){ mygrid[0].toggleToolbar() } })/
+        search = %Q/.navButtonAdd("##{id}_pager",{caption:"",title:jQuery.jgrid.nav.searchtitle, buttonicon :'ui-icon-search', onClickButton:function(){ mygrid[0].toggleToolbar() } })/
         filter_toolbar = "mygrid.filterToolbar();"
         filter_toolbar << "mygrid[0].toggleToolbar()"
       end
@@ -229,7 +229,7 @@ module Jqgrid
             // When the cookie is saved the items will be a comma separated string
             // so we will split the cookie by comma to get the original array
             // Get the cookie if it exists
-            var cookie = $.cookie(cookieName);
+            var cookie = jQuery.cookie(cookieName);
             // Load the items or a new array if null.
             var items = cookie ? cookie.split(/,/) : new Array();
 
@@ -241,19 +241,19 @@ module Jqgrid
               },
               "del": function(val) {
                 // Remove value from the items.
-                if($.inArray(val, items) > -1) items.splice($.inArray(val, items), 1);
+                if(jQuery.inArray(val, items) > -1) items.splice(jQuery.inArray(val, items), 1);
               },
               "clear": function() {
                 //clear the cookie.
-                $.cookie(cookieName, null);
+                jQuery.cookie(cookieName, null);
               },
               "save": function() {
                 // Save the items to a cookie.
-                $.cookie(cookieName, items.join(','));
+                jQuery.cookie(cookieName, items.join(','));
               },
               "exists": function(val) {
                 // Check if value exists in array
-                return ($.inArray(val, items) > -1);
+                return (jQuery.inArray(val, items) > -1);
               },
               "items": function() {
                 // Get all the items.
@@ -293,7 +293,7 @@ module Jqgrid
             var unselected_records = new cookieArray("#{id}_unselected_records");
             // Process the ids
             //alert(selected_records.items());
-            $.each(ids, function (i, id) {
+            jQuery.each(ids, function (i, id) {
               if (selected) {
                 selected_records.add(id);
                 unselected_records.del(id);
@@ -317,7 +317,7 @@ module Jqgrid
               var grid = jQuery("##{id}");
               // Process and apply selections
               grid_ids = grid.getDataIDs();
-              $.each(grid.getDataIDs(), function (i, id) {
+              jQuery.each(grid.getDataIDs(), function (i, id) {
                 if (selected_records.exists(id)) {
                   grid.setSelection(id, false);
                 }
@@ -551,7 +551,7 @@ module Jqgrid
         		    height: '100%'
         		})
         		.navGrid("#"+pager_id,{edit:#{options[:subgrid][:edit]},add:#{options[:subgrid][:add]},del:#{options[:subgrid][:delete]},search:false})
-            .navButtonAdd("#"+pager_id,{caption:"",title:$.jgrid.nav.searchtitle, buttonicon :'ui-icon-search', onClickButton:function(){ subgrd[0].toggleToolbar() } })
+            .navButtonAdd("#"+pager_id,{caption:"",title:jQuery.jgrid.nav.searchtitle, buttonicon :'ui-icon-search', onClickButton:function(){ subgrd[0].toggleToolbar() } })
             subgrd.filterToolbar();
             subgrd[0].toggleToolbar();
         	},
@@ -628,7 +628,7 @@ module Jqgrid
         <div id="flash_alert" style="display:none;padding:0.7em;" class="ui-state-highlight ui-corner-all"></div>
         <table id="#{id}" class="scroll" cellpadding="0" cellspacing="0"></table>
         <div id="#{id}_pager" class="scroll" style="text-align:center;"></div>
-      )
+      ).html_safe
     end
 
     private
@@ -692,7 +692,7 @@ module Jqgrid
         elsif couple[0] == :elmsuffix || couple[0] == :elmpreffix # :elmsuffix => %Q~<a id="companysearch" href="javascript:void(0)"><span id="companysearchicon" class="ui-icon ui-icon-plus" style="position:absolute; top:2px; right:25px;"></span></a>~
           options << %Q~#{couple[0]}:'#{couple[1]}',~
         else # :size => 30, :rows => 5, :maxlength => 20, ...
-          if couple[0] == :elmsuffix || couple[1].instance_of?(Fixnum) || couple[1] == 'true' || couple[1] == 'false' || couple[1] == true || couple[1] == false || couple[1] =~ /function/
+          if couple[0] == :elmsuffix || couple[1].instance_of?(Symbol) || couple[1].instance_of?(Fixnum) || couple[1] == 'true' || couple[1] == 'false' || couple[1] == true || couple[1] == false || couple[1] =~ /function/
               options << %Q/#{couple[0]}:#{couple[1]},/
             else
               options << %Q/#{couple[0]}:"#{couple[1]}",/          
