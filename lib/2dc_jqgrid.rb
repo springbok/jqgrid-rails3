@@ -154,10 +154,10 @@ module Jqgrid
           error_handler_code = %Q/function #{options[:error_handler]}(r, data, action) {
             var resText=JSON.parse(r.responseText);
             if (resText[0]==true) {
-              $('#flash_alert').html("<span class='ui-icon ui-icon-info' style='float:left; margin-right:.3em;'><\/span>"+resText[1]);
-              $('#flash_alert').slideDown();
+              jQuery('#flash_alert').html("<span class='ui-icon ui-icon-info' style='float:left; margin-right:.3em;'><\/span>"+resText[1]);
+              jQuery('#flash_alert').slideDown();
               window.setTimeout(function() {
-                $('#flash_alert').slideUp();
+                jQuery('#flash_alert').slideUp();
                 }, 3000);
                 return [resText[0]]
               }else{
@@ -174,7 +174,7 @@ module Jqgrid
       search = ""
       filter_toolbar = ""
       if options[:search] == 'true'
-        search = %Q/.navButtonAdd("##{id}_pager",{caption:"",title:$.jgrid.nav.searchtitle, buttonicon :'ui-icon-search', onClickButton:function(){ mygrid[0].toggleToolbar() } })/
+        search = %Q/.navButtonAdd("##{id}_pager",{caption:"",title:jQuery.jgrid.nav.searchtitle, buttonicon :'ui-icon-search', onClickButton:function(){ mygrid[0].toggleToolbar() } })/
         filter_toolbar = "mygrid.filterToolbar();"
         filter_toolbar << "mygrid[0].toggleToolbar()"
       end
@@ -234,7 +234,7 @@ module Jqgrid
             // When the cookie is saved the items will be a comma separated string
             // so we will split the cookie by comma to get the original array
             // Get the cookie if it exists
-            var cookie = $.cookie(cookieName);
+            var cookie = jQuery.cookie(cookieName);
             // Load the items or a new array if null.
             var items = cookie ? cookie.split(/,/) : new Array();
 
@@ -246,19 +246,19 @@ module Jqgrid
               },
               "del": function(val) {
                 // Remove value from the items.
-                if($.inArray(val, items) > -1) items.splice($.inArray(val, items), 1);
+                if(jQuery.inArray(val, items) > -1) items.splice(jQuery.inArray(val, items), 1);
               },
               "clear": function() {
                 //clear the cookie.
-                $.cookie(cookieName, null);
+                jQuery.cookie(cookieName, null);
               },
               "save": function() {
                 // Save the items to a cookie.
-                $.cookie(cookieName, items.join(','));
+                jQuery.cookie(cookieName, items.join(','));
               },
               "exists": function(val) {
                 // Check if value exists in array
-                return ($.inArray(val, items) > -1);
+                return (jQuery.inArray(val, items) > -1);
               },
               "items": function() {
                 // Get all the items.
@@ -298,7 +298,7 @@ module Jqgrid
             var unselected_records = new cookieArray("#{id}_unselected_records");
             // Process the ids
             //alert(selected_records.items());
-            $.each(ids, function (i, id) {
+            jQuery.each(ids, function (i, id) {
               if (selected) {
                 selected_records.add(id);
                 unselected_records.del(id);
@@ -322,7 +322,7 @@ module Jqgrid
               var grid = jQuery("##{id}");
               // Process and apply selections
               grid_ids = grid.getDataIDs();
-              $.each(grid.getDataIDs(), function (i, id) {
+              jQuery.each(grid.getDataIDs(), function (i, id) {
                 if (selected_records.exists(id)) {
                   grid.setSelection(id, false);
                 }
@@ -376,7 +376,7 @@ module Jqgrid
         options[:master_details_grids].each do |grid|
           if grid.is_a?(Hash)
             grid_methods += %Q~
-              caption_value = $('##{id}').jqGrid('getCell', ids, '#{grid[:caption_field]}');
+              caption_value = jQuery('##{id}').jqGrid('getCell', ids, '#{grid[:caption_field]}');
               jQuery("##{grid[:grid_id]}").setGridParam({url:"#{grid[:details_url]}?q=1&id="+ids,page:1})
                 .setCaption("#{grid[:caption]}: "+caption_value);
               jQuery("##{grid[:grid_id]}").trigger('reloadGrid');
@@ -412,6 +412,17 @@ module Jqgrid
           return false; 
         });/
       end
+
+      dblclick = ""
+      # Enable row double-clicking handler
+      if  options[:dblclick_handler].present?
+        dblclick = %Q/
+        ondblClickRow: function(id){ 
+          if(id){ 
+            #{options[:dblclick_handler]}(id); 
+          } 
+        },/
+      end  
 
       # Enable inline editing
       # When a row is selected, all fields are transformed to input types
@@ -457,7 +468,7 @@ module Jqgrid
       if options[:context_menu].size > 0 && !options[:context_menu][:menu_id].blank?
         context_menu = %Q/
         afterInsertRow: function(rowid, rowdata, rowelem){
-          $('#' + rowid).contextMenu('#{options[:context_menu][:menu_id]}', #{options[:context_menu][:menu_bindings]});
+          jQuery('#' + rowid).contextMenu('#{options[:context_menu][:menu_id]}', #{options[:context_menu][:menu_bindings]});
         },/
       end           
       
@@ -527,7 +538,7 @@ module Jqgrid
         if options[:subgrid][:context_menu].size > 0 && !options[:subgrid][:context_menu][:menu_id].blank?
           subgrid_context_menu = %Q/
           afterInsertRow: function(rowid, rowdata, rowelem){
-            $('#' + rowid).contextMenu('#{options[:subgrid][:context_menu][:menu_id]}', #{options[:subgrid][:context_menu][:menu_bindings]});
+            jQuery('#' + rowid).contextMenu('#{options[:subgrid][:context_menu][:menu_id]}', #{options[:subgrid][:context_menu][:menu_bindings]});
           },/
         end
 
@@ -538,7 +549,7 @@ module Jqgrid
         		var subgrid_table_id, pager_id;
         		subgrid_table_id = subgrid_id+"_t";
         		pager_id = "p_"+subgrid_table_id;
-        		$("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+pager_id+"' class='scroll'></div>");
+        		jQuery("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+pager_id+"' class='scroll'></div>");
         		var subgrd = jQuery("#"+subgrid_table_id).jqGrid({
         			url:"#{options[:subgrid][:url]}?q=2&id="+row_id,
                                 editurl:'#{options[:subgrid][:edit_url]}?parent_id='+row_id,                            
@@ -573,7 +584,7 @@ module Jqgrid
               // Delete options
               {closeOnEscape:true,modal:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'delete');}}
             )
-            .navButtonAdd("#"+pager_id,{caption:"",title:$.jgrid.nav.searchtitle, buttonicon :'ui-icon-search', onClickButton:function(){ subgrd[0].toggleToolbar() } })
+            .navButtonAdd("#"+pager_id,{caption:"",title:jQuery.jgrid.nav.searchtitle, buttonicon :'ui-icon-search', onClickButton:function(){ subgrd[0].toggleToolbar() } })
             subgrd.filterToolbar();
             subgrd[0].toggleToolbar();
         	},
@@ -636,6 +647,7 @@ module Jqgrid
               #{multiselect_handlers}
               #{onselectrow}
               #{grid_loaded}
+	      #{dblclick}
               #{before_request}
               #{grid_complete}
               #{context_menu}
@@ -722,7 +734,7 @@ module Jqgrid
             options << "%s:%s;" % [obj.send(couple[1].second), obj.send(couple[1].third)]
           end
           options.chop! << %Q/",/
-        elsif couple[0] == :dataEvents || couple[0] == :dataInit || couple[0] == :custom_func # :dataInit => %Q~{$(element).datepicker({onSelect: getDt(dateText, inst); }})}~
+        elsif couple[0] == :dataEvents || couple[0] == :dataInit || couple[0] == :custom_func # :dataInit => %Q~{jQuery(element).datepicker({onSelect: getDt(dateText, inst); }})}~
           options << %Q~#{couple[0]}:#{couple[1]},~
         elsif couple[0] == :elmsuffix || couple[0] == :elmpreffix # :elmsuffix => %Q~<a id="companysearch" href="javascript:void(0)"><span id="companysearchicon" class="ui-icon ui-icon-plus" style="position:absolute; top:2px; right:25px;"></span></a>~
           options << %Q~#{couple[0]}:'#{couple[1]}',~
