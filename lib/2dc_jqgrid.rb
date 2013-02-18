@@ -1,8 +1,8 @@
 module Jqgrid
 
-  def jqgrid_stylesheets(theme="default")
-      stylesheet_link_tag "jqgrid/themes/#{theme}/jquery-ui-1.8.custom.css", 
-        'jqgrid/ui.jqgrid.css', 
+    def jqgrid_stylesheets(theme="default")
+      stylesheet_link_tag "jqgrid/themes/#{theme}/jquery-ui-1.8.custom.css",
+        'jqgrid/ui.jqgrid.css',
         :cache => "jqgrid-#{theme}-css"
     end
 
@@ -56,6 +56,11 @@ module Jqgrid
           :loadonce            => 'false',
           :cellsubmit          => 'remote',
           :cellEdit            => 'false',
+	        # If not a *local* search then it depends on DB, postgres for example is case insensitive when using LIKE
+          # so it will ignore this, in docs is says:
+          # By default the *local* searching is case-sensitive. To make the local search and 
+          # sorting not case-insensitive set this options to true
+          :ignoreCase	       => 'true',
           :form_width          => 300,
           :loadui              => 'enable',
           :context_menu        => {:menu_bindings => nil, :menu_id => nil},
@@ -64,7 +69,9 @@ module Jqgrid
           :customButtons       => [],
           :before_show_form_edit => 'null',
           :before_show_form_add  => 'null',
-          :group_by            => 'null'
+          :before_init_data => 'null',
+          :group_by            => 'null',
+	  :selectonexpand      => 'true'
         }.merge(options)
       
       # Stringify options values
@@ -79,6 +86,11 @@ module Jqgrid
       if options[:before_show_form_edit] == 'null'
         # If no error handlers return true
         options[:before_show_form_edit] = 'true;'
+      end
+      # beforeInitData handlers
+      if options[:before_init_data] == 'null'
+        # If no error handlers return true
+        options[:before_init_data] = 'true;'
       end
       if options[:before_show_form_add] == 'null'
         # If no error handlers return true
@@ -102,7 +114,7 @@ module Jqgrid
       if options[:grid_complete].present?
         grid_complete = %Q/
         gridComplete: function(){
-          #{options[:grid_complete]}();
+          #{options[:grid_complete]}(this);
         },
         /
       end
@@ -114,6 +126,17 @@ module Jqgrid
         grid_loaded = %Q/
         loadComplete: function(){
           #{options[:grid_loaded]}();
+        },
+        /
+      end
+
+      # Enable onHeaderClick event
+      # When user clicks on header this event will be called
+      onheaderclick = ""
+      if options[:onheaderclick].present?
+        onheaderclick = %Q/
+        onHeaderClick: function(grid_state){
+          #{options[:onheaderclick]}(grid_state, this);
         },
         /
       end
@@ -323,7 +346,7 @@ module Jqgrid
                 }
               });
             }
-            #{options[:grid_complete].present? ? "#{options[:grid_complete]}();" : ''}
+            #{options[:grid_complete].present? ? "#{options[:grid_complete]}(this);" : ''}
           },
         ~
         grid_complete = ''
@@ -427,7 +450,7 @@ module Jqgrid
       if options[:direct_selection] && options[:selection_handler].present?
         direct_link = %Q/
           if(ids){
-            #{options[:selection_handler]}(ids);
+            #{options[:selection_handler]}(ids, this);
           }
         /
       end
@@ -476,6 +499,13 @@ module Jqgrid
             :viewrecords   => 'true',
             :rowlist       => '[10,25,50,100]',
             :shrinkToFit   => 'false',
+            :form_width    => 300,
+            :autowidth     => 'false',
+            :loadui        => 'enable',
+            :footerrow           => 'false',
+            :userDataOnFooter    => 'false',
+            :before_init_data => 'null',
+            :before_show_form => 'null',
             :context_menu  => {:menu_bindings => nil, :menu_id => nil},
           }.merge(options[:subgrid])
 
@@ -483,6 +513,29 @@ module Jqgrid
         options[:subgrid].inject({}) do |suboptions, (key, value)|
           suboptions[key] = value.to_s
           suboptions
+        end
+
+      	# beforeInitData handlers
+      	if options[:subgrid][:before_init_data] == 'null'
+          # If no error handlers return true
+          options[:subgrid][:before_init_data] = 'true;'
+        end
+
+      	# beforeShowForm handlers
+      	if options[:subgrid][:before_show_form] == 'null'
+          # If no error handlers return true
+          options[:subgrid][:before_show_form] = 'true;'
+        end
+
+        # Enable gridComplete callback
+        # When grid completely loaded, call the Javascript function options[:subgrid][:grid_complete] (defined by the user)
+        subgrid_grid_complete = ""
+        if options[:subgrid][:grid_complete].present?
+          subgrid_grid_complete = %Q/
+          gridComplete: function(){
+            #{options[:subgrid][:grid_complete]}(this);
+          },
+         /
         end
         
         subgrid_inline_edit = ""
@@ -532,25 +585,40 @@ module Jqgrid
         		$("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+pager_id+"' class='scroll'></div>");
         		var subgrd = jQuery("#"+subgrid_table_id).jqGrid({
         			url:"#{options[:subgrid][:url]}?q=2&id="+row_id,
-              editurl:'#{options[:subgrid][:edit_url]}?parent_id='+row_id,                            
+                                editurl:'#{options[:subgrid][:edit_url]}?parent_id='+row_id,                            
         			datatype: "json",
         			colNames: #{sub_col_names},
         			colModel: #{sub_col_model},
-        		   	rowNum:#{options[:subgrid][:rows_per_page]},
-        		   	pager: pager_id,
-        		   	imgpath: '/images/jqgrid',
-        		   	sortname: '#{options[:subgrid][:sort_column]}',
-        		    sortorder: '#{options[:subgrid][:sort_order]}',
-                viewrecords: #{options[:subgrid][:viewrecords]},
-                rowlist: #{options[:subgrid][:rowlist]},
-                shrinkToFit: #{options[:subgrid][:shrinkToFit]},
-                toolbar : [true,"top"], 
-        		    #{subgrid_inline_edit}
-        		    #{subgrid_direct_link}
-                #{subgrid_context_menu}
-        		    height: '100%'
+              rowNum:#{options[:subgrid][:rows_per_page]},
+              pager: pager_id,
+              imgpath: '/images/jqgrid',
+              sortname: '#{options[:subgrid][:sort_column]}',
+              loadui: '#{options[:subgrid][:loadui]}',
+              sortorder: '#{options[:subgrid][:sort_order]}',
+              viewrecords: #{options[:subgrid][:viewrecords]},
+              rowlist: #{options[:subgrid][:rowlist]},
+              shrinkToFit: #{options[:subgrid][:shrinkToFit]},
+              autowidth: #{options[:subgrid][:autowidth]},
+              footerrow: #{options[:subgrid][:footerrow]},
+              userDataOnFooter: #{options[:subgrid][:userDataOnFooter]},
+
+              //toolbar : [true,"top"],
+              #{subgrid_inline_edit}
+              #{subgrid_direct_link}
+              #{subgrid_grid_complete}
+              #{subgrid_context_menu}
+              height: '100%'
         		})
-        		.navGrid("#"+pager_id,{edit:#{options[:subgrid][:edit]},add:#{options[:subgrid][:add]},del:#{options[:subgrid][:delete]},search:false})
+        		.navGrid("#"+pager_id,
+              {edit:#{options[:subgrid][:edit]},add:#{options[:subgrid][:add]},del:#{options[:subgrid][:delete]},search:false},
+              // Edit options
+              // *** Set edit & add forms modal to false, if true then it causes all sorts of problems with datepicker and other issues ***
+              {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:subgrid][:form_width]},closeAfterEdit:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'edit');},beforeInitData:function(form){return #{options[:subgrid][:before_init_data]}(form);},beforeShowForm:function(form){return #{options[:subgrid][:before_show_form]}(form);}},
+              // Add options
+              {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:subgrid][:form_width]},closeAfterAdd:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'add');},beforeInitData:function(form){return #{options[:subgrid][:before_init_data]}(form);},beforeShowForm:function(form){return #{options[:subgrid][:before_show_form]}(form);}},
+              // Delete options
+              {closeOnEscape:true,modal:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'delete');}}
+            )
             .navButtonAdd("#"+pager_id,{caption:"",title:$.jgrid.nav.searchtitle, buttonicon :'ui-icon-search', onClickButton:function(){ subgrd[0].toggleToolbar() } })
             subgrd.filterToolbar();
             subgrd[0].toggleToolbar();
@@ -592,15 +660,29 @@ module Jqgrid
               shrinkToFit: #{options[:shrinkToFit]}, 
               footerrow: #{options[:footerrow]},
               loadonce: #{options[:loadonce]},
+	            ignoreCase: #{options[:ignoreCase]},
               cellsubmit: '#{options[:cellsubmit]}',
               cellEdit: #{options[:cellEdit]},
               userDataOnFooter: #{options[:userDataOnFooter]},
+	            subGridOptions: {
+		            openicon : "ui-icon-arrowreturn-1-e",
+                selectOnExpand : #{options[:selectonexpand]}, 
+	            },
+              loadError: function(xhr, status, error){
+                // Redirect to login page when session expires, see application controller
+                if (error == 'Unauthorized') {
+                  window.location = '/login';
+                } else {
+	                alert('An error has occurred during the grid load operation');
+		            }
+              },
               #{grouping}
               #{grouping_view}
               #{multiselect}
               #{multiselect_handlers}
               #{onselectrow}
               #{grid_loaded}
+              #{onheaderclick}
               #{before_request}
               #{grid_complete}
               #{context_menu}
@@ -612,9 +694,9 @@ module Jqgrid
               {edit:#{edit_button},add:#{options[:add]},del:#{options[:delete]},view:#{options[:view]},search:false,refresh:true},
               // Edit options
               // *** Set edit & add forms modal to false, if true then it causes all sorts of problems with datepicker and other issues ***
-              {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:form_width]},closeAfterEdit:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'edit');},beforeShowForm:function(form){return #{options[:before_show_form_edit]}(form);}},
+              {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:form_width]},closeAfterEdit:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'edit');},beforeShowForm:function(form){return #{options[:before_show_form_edit]}(form);},beforeInitData:function(form){return #{options[:before_init_data]}(form);}},
               // Add options
-              {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:form_width]},closeAfterAdd:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'add');},beforeShowForm:function(form){return #{options[:before_show_form_add]}(form);}},
+              {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:form_width]},closeAfterAdd:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'add');},beforeShowForm:function(form){return #{options[:before_show_form_add]}(form);},beforeInitData:function(form){return #{options[:before_init_data]}(form);}},
               // Delete options
               {closeOnEscape:true,modal:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'delete');}}
             )
@@ -713,7 +795,19 @@ module JqgridJson
       json << %Q(,"rows":[)
       each do |elem|
         elem.id ||= index(elem)
-        json << %Q({"id":"#{elem.id}","cell":[)
+        # Need to check if this is a composite key, if so we need to
+        # remove any meta characters as the generated ID's in the HTML
+        # can not contain meta chars, see
+        # http://stackoverflow.com/questions/3208876/using-jquery-selector-with-ids-with-comma
+        if elem.id.is_a?(Array)
+          # Here we convert everything to ASCII code and join with a -
+          # To decode we would do the opposite, i.e.
+          # ids.split('-').map(&:to_i).each {|c| a+=c.chr}
+          ids = elem.id.join(',').split('').map(&:ord).join('-')
+        else
+          ids = elem.id
+        end
+        json << %Q({"id":"#{ids}","cell":[)
         couples = elem.attributes.symbolize_keys
         attributes.each do |atr|
           value = get_atr_value(elem, atr, couples)
@@ -800,3 +894,4 @@ module JqgridFilter
     conditions.chomp("AND ")
   end
 end
+
