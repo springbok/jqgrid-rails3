@@ -742,6 +742,8 @@ module Jqgrid
           options << "searchoptions:#{get_sub_options(couple[1])},"
         elsif couple[0] == :editrules
           options << "editrules:#{get_sub_options(couple[1])},"
+        elsif couple[0] == :cellattr
+          options << %Q~#{couple[0]}:#{couple[1]},~
         else
           if couple[1].class == String
             options << "#{couple[0]}:'#{couple[1]}',"
