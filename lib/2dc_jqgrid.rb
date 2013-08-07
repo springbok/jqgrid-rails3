@@ -497,7 +497,7 @@ module Jqgrid
             :delete        => 'false',
             :search        => 'false',
             :viewrecords   => 'true',
-            :rowlist       => '[10,25,50,100]',
+            :rowlist       => '[10,25,50,100,200,300]',
             :shrinkToFit   => 'false',
             :form_width    => 300,
             :autowidth     => 'false',
