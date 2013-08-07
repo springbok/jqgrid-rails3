@@ -46,7 +46,7 @@ module Jqgrid
           :autowidth           => 'false',
           :rownumbers          => 'false',
           :viewrecords         => 'true',
-          :rowlist             => '[10,25,50,100]',
+          :rowlist             => '[10,25,50,100,200,300]',
           :pagerpos            => 'center',
           :hiddengrid          => 'false',
           :hidegrid            => 'false',
