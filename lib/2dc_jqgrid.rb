@@ -41,7 +41,8 @@ module Jqgrid
           :delete              => 'false',
           :search              => 'true',
           :edit                => 'false',          
-          :view                => 'false',          
+          :view                => 'false',  
+          :refresh             => 'false',        
           :inline_edit         => 'false',
           :autowidth           => 'false',
           :rownumbers          => 'false',
@@ -691,7 +692,7 @@ module Jqgrid
               caption: "#{title}"             
             })
             .navGrid('##{id}_pager',
-              {edit:#{edit_button},add:#{options[:add]},del:#{options[:delete]},view:#{options[:view]},search:false,refresh:true},
+              {edit:#{edit_button},add:#{options[:add]},del:#{options[:delete]},view:#{options[:view]},search:false,refresh:#{options[:refresh]}},
               // Edit options
               // *** Set edit & add forms modal to false, if true then it causes all sorts of problems with datepicker and other issues ***
               {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:form_width]},closeAfterEdit:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'edit');},beforeShowForm:function(form){return #{options[:before_show_form_edit]}(form);},beforeInitData:function(form){return #{options[:before_init_data]}(form);}},
