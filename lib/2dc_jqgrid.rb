@@ -652,7 +652,7 @@ module Jqgrid
               height: '#{options[:height]}',
               #{"sortname: '#{options[:sort_column]}'," unless options[:sort_column].blank?}
               #{"sortorder: '#{options[:sort_order]}'," unless options[:sort_order].blank?}
-              #{"actionsNavOptions: '#{options[:actionsNavOptions]}'," unless options[:actionsNavOptions].blank?}
+              #{"actionsNavOptions: #{options[:actionsNavOptions]}," unless options[:actionsNavOptions].blank?}
               gridview: #{options[:gridview]},
               scrollrows: true,
               autowidth: #{options[:autowidth]},
