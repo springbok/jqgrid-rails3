@@ -73,7 +73,8 @@ module Jqgrid
           :before_init_data => 'null',
           :group_by            => 'null',
 	  :selectonexpand      => 'true',
-	  :actionsNavOptions   => ''
+	  :actionsNavOptions   => '',
+	  :searching           => ''
         }.merge(options)
       
       # Stringify options values
@@ -653,6 +654,7 @@ module Jqgrid
               #{"sortname: '#{options[:sort_column]}'," unless options[:sort_column].blank?}
               #{"sortorder: '#{options[:sort_order]}'," unless options[:sort_order].blank?}
               #{"actionsNavOptions: #{options[:actionsNavOptions]}," unless options[:actionsNavOptions].blank?}
+              #{"searching: #{options[:searching]}," unless options[:searching].blank?}
               gridview: #{options[:gridview]},
               scrollrows: true,
               autowidth: #{options[:autowidth]},
