@@ -9,7 +9,7 @@ module Jqgrid
     def jqgrid_javascripts
       locale = I18n.locale rescue :en
       javascript_include_tag "jqgrid/i18n/grid.locale-#{locale}.js",
-        'jqgrid/jquery.jqGrid.src.js',
+        'jqgrid/jquery.jqgrid.min.js',
         # Don't know if we need it, if smth not working, just uncomment it
         #'jqgrid/grid.tbltogrid',
         'jqgrid/jquery.contextmenu.r2.packed.js',
