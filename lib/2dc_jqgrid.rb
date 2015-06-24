@@ -42,7 +42,7 @@ module Jqgrid
           :search              => 'true',
           :edit                => 'false',          
           :view                => 'false',  
-          :refresh             => 'false',        
+          :refresh             => 'true',        
           :inline_edit         => 'false',
           :autowidth           => 'false',
           :rownumbers          => 'false',
