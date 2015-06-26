@@ -70,7 +70,8 @@ module Jqgrid
           :customButtons       => [],
           :before_show_form_edit => 'null',
           :before_show_form_add  => 'null',
-          :before_init_data => 'null',
+          :before_init_data    => 'null',
+          :on_close_form       => 'null',
           :group_by            => 'null',
 	  :selectonexpand      => 'true',
 	  :actionsNavOptions   => '',
@@ -98,6 +99,9 @@ module Jqgrid
       if options[:before_show_form_add] == 'null'
         # If no error handlers return true
         options[:before_show_form_add] = 'true;'
+      end
+      if options[:on_close_form] == 'null'
+        options[:on_close_form] = 'true;'
       end
 
       # Enable beforeRequest callback
@@ -699,9 +703,9 @@ module Jqgrid
               {edit:#{edit_button},add:#{options[:add]},del:#{options[:delete]},view:#{options[:view]},search:false,refresh:#{options[:refresh]}},
               // Edit options
               // *** Set edit & add forms modal to false, if true then it causes all sorts of problems with datepicker and other issues ***
-              {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:form_width]},closeAfterEdit:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'edit');},beforeShowForm:function(form){return #{options[:before_show_form_edit]}(form);},beforeInitData:function(form){return #{options[:before_init_data]}(form);}},
+              {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:form_width]},closeAfterEdit:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'edit');},beforeShowForm:function(form){return #{options[:before_show_form_edit]}(form);},onClose:function(form){return #{options[:on_close_form]}(form);},beforeInitData:function(form){return #{options[:before_init_data]}(form);}},
               // Add options
-              {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:form_width]},closeAfterAdd:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'add');},beforeShowForm:function(form){return #{options[:before_show_form_add]}(form);},beforeInitData:function(form){return #{options[:before_init_data]}(form);}},
+              {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:form_width]},closeAfterAdd:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'add');},beforeShowForm:function(form){return #{options[:before_show_form_add]}(form);},onClose:function(form){return #{options[:on_close_form]}(form);},beforeInitData:function(form){return #{options[:before_init_data]}(form);}},
               // Delete options
               {closeOnEscape:true,modal:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'delete');}}
             )
