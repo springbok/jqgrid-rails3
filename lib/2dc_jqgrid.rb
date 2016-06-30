@@ -137,6 +137,21 @@ module Jqgrid
         /
       end
 
+      # Enable beforeSelectRow callback
+      # This event fire when the user click on the row, but before select them.
+      # rowid is the id of the row.
+      # e is the event object
+      # This event should return boolean true or false. If the event return true the selection is done.
+      # If the event return false the row is not selected and any other action if defined does not occur.
+      before_select_row = ""
+      if options[:before_select_row].present?
+        before_select_row = %Q/
+        beforeSelectRow: function(row_id, e){
+          #{options[:before_select_row]}(row_id, e);
+        },
+        /
+      end
+
       # Enable onHeaderClick event
       # When user clicks on header this event will be called
       onheaderclick = ""
@@ -691,6 +706,7 @@ module Jqgrid
               #{multiselect_handlers}
               #{onselectrow}
               #{grid_loaded}
+              #{before_select_row}
               #{onheaderclick}
               #{before_request}
               #{grid_complete}
