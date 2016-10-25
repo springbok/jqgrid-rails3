@@ -1,19 +1,15 @@
 module Jqgrid
 
     def jqgrid_stylesheets(theme="default")
-      stylesheet_link_tag "jqgrid/themes/#{theme}/jquery-ui-1.8.custom.css",
-        'jqgrid/ui.jqgrid.css',
+      stylesheet_link_tag 'jqgrid/ui.jqgrid.min.css',
         :cache => "jqgrid-#{theme}-css"
     end
 
     def jqgrid_javascripts
       locale = I18n.locale rescue :en
-      javascript_include_tag "jqgrid/i18n/grid.locale-#{locale}.js",
-        'jqgrid/jquery.jqgrid.min.js',
-        # Don't know if we need it, if smth not working, just uncomment it
-        #'jqgrid/grid.tbltogrid',
-        'jqgrid/jquery.contextmenu.r2.packed.js',
-        'jqgrid/jquery.cookie.js',
+      javascript_include_tag 'jqgrid/jquery.jqgrid.min.js',
+        'jqgrid/jquery.contextmenu.min.js',
+        'jqgrid/js.cookie.js',
         :cache => 'jqgrid-js'
     end
 
@@ -274,7 +270,7 @@ module Jqgrid
             // When the cookie is saved the items will be a comma separated string
             // so we will split the cookie by comma to get the original array
             // Get the cookie if it exists
-            var cookie = $.cookie(cookieName);
+            var cookie = Cookies.get(cookieName);
             // Load the items or a new array if null.
             var items = cookie ? cookie.split(/,/) : new Array();
 
@@ -290,11 +286,11 @@ module Jqgrid
               },
               "clear": function() {
                 //clear the cookie.
-                $.cookie(cookieName, null);
+                Cookies.set(cookieName, null);
               },
               "save": function() {
                 // Save the items to a cookie.
-                $.cookie(cookieName, items.join(','));
+                Cookies.set(cookieName, items.join(','));
               },
               "exists": function(val) {
                 // Check if value exists in array
