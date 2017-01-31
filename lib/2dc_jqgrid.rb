@@ -413,8 +413,10 @@ module Jqgrid
           if grid.is_a?(Hash)
             grid_methods += %Q~
               caption_value = $('##{id}').jqGrid('getCell', ids, '#{grid[:caption_field]}');
+              caption = '#{grid[:caption]}';
+              if (jQuery.trim(caption).length > 0) { caption = caption + ': '}
               jQuery("##{grid[:grid_id]}").setGridParam({url:"#{grid[:details_url]}?q=1&id="+ids,page:1})
-                .setCaption("#{grid[:caption]}: "+caption_value);
+                .setCaption(caption+caption_value);
               jQuery("##{grid[:grid_id]}").trigger('reloadGrid');
               ~
             if grid.has_key?(:edit_url)
