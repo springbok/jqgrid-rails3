@@ -2,7 +2,7 @@
 $:.push File.expand_path("../lib", __FILE__)
 Gem::Specification.new do |s|
   s.name        = "jqgrid-rails3"
-  s.version     = "0.42"
+  s.version     = "0.43"
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["2dconcept"]
   s.email       = ["etiennevt@gmail.com"]

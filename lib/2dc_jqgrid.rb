@@ -69,9 +69,11 @@ module Jqgrid
           :before_init_data    => 'null',
           :on_close_form       => 'null',
           :group_by            => 'null',
-	  :selectonexpand      => 'true',
-	  :actionsNavOptions   => '',
-	  :searching           => ''
+	        :selectonexpand      => 'true',
+	        :actionsNavOptions   => '',
+	        :searching           => '',
+          :guistyle            => 'bootstrap4',
+          :iconset             => 'fontAwesome',
         }.merge(options)
       
       # Stringify options values
@@ -527,6 +529,8 @@ module Jqgrid
             :before_init_data => 'null',
             :before_show_form => 'null',
             :context_menu  => {:menu_bindings => nil, :menu_id => nil},
+            :guistyle            => 'bootstrap4',
+            :iconset             => 'fontAwesome',
           }.merge(options[:subgrid])
 
         # Stringify options values
@@ -621,6 +625,8 @@ module Jqgrid
               autowidth: #{options[:subgrid][:autowidth]},
               footerrow: #{options[:subgrid][:footerrow]},
               userDataOnFooter: #{options[:subgrid][:userDataOnFooter]},
+              iconSet: #{options[:subgrid][:iconset]},              
+              guiStyle: #{options[:subgrid][:guistyle]},              
 
               //toolbar : [true,"top"],
               #{subgrid_inline_edit}
@@ -665,6 +671,8 @@ module Jqgrid
               pagerpos:'#{options[:pagerpos]}', 
               rowNum:#{options[:rows_per_page]},
               rowList:#{options[:rowlist]},
+              iconSet: '#{options[:iconset]}',
+              guiStyle: '#{options[:guistyle]}',
               imgpath: '/images/jqgrid',
               viewrecords:#{options[:viewrecords]},
               height: '#{options[:height]}',
