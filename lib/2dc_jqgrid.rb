@@ -212,7 +212,7 @@ module Jqgrid
       search = ""
       filter_toolbar = ""
       if options[:search] == 'true'
-        search = %Q/.navButtonAdd("##{id}_pager",{caption:"",title:$.jgrid.nav.searchtitle, buttonicon :'ui-icon-search', onClickButton:function(){ mygrid[0].toggleToolbar() } })/
+        search = %Q/.navButtonAdd("##{id}_pager",{caption:"",title:$.jgrid.nav.searchtitle, buttonicon : '#{get_search_icon(options)}', onClickButton:function(){ mygrid[0].toggleToolbar() } })/
         filter_toolbar = "mygrid.filterToolbar();"
         filter_toolbar << "mygrid[0].toggleToolbar()"
       end
@@ -645,7 +645,7 @@ module Jqgrid
               // Delete options
               {closeOnEscape:true,modal:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'delete');}}
             )
-            .navButtonAdd("#"+pager_id,{caption:"",title:$.jgrid.nav.searchtitle, buttonicon :'ui-icon-search', onClickButton:function(){ subgrd[0].toggleToolbar() } })
+            .navButtonAdd("#"+pager_id,{caption:"",title:$.jgrid.nav.searchtitle, buttonicon :'#{get_search_icon(options)}', onClickButton:function(){ subgrd[0].toggleToolbar() } })
             subgrd.filterToolbar();
             subgrd[0].toggleToolbar();
         	},
@@ -784,6 +784,18 @@ module Jqgrid
         end
       end
       options.chop!
+    end
+    
+    def get_search_icon(options)
+      icon = 'ui-icon-search'          
+      if !options[:iconset].blank? 
+        if options[:iconset].downcase == "fontawesome" 
+          icon = 'fa-search'
+        else
+          icon = 'glyphicon-search'
+        end
+      end
+      icon      
     end
 
     # Generate options for editable fields (value, data, width, maxvalue, cols, rows, ...)
