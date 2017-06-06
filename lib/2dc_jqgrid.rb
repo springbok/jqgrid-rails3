@@ -625,8 +625,8 @@ module Jqgrid
               autowidth: #{options[:subgrid][:autowidth]},
               footerrow: #{options[:subgrid][:footerrow]},
               userDataOnFooter: #{options[:subgrid][:userDataOnFooter]},
-              iconSet: #{options[:subgrid][:iconset]},              
-              guiStyle: #{options[:subgrid][:guistyle]},              
+              iconSet: '#{options[:subgrid][:iconset]}',
+              guiStyle: '#{options[:subgrid][:guistyle]}',
 
               //toolbar : [true,"top"],
               #{subgrid_inline_edit}
