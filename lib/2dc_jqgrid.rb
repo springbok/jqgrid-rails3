@@ -889,7 +889,7 @@ module JqgridJson
     
   def escape_json(json)
     if json
-      json.to_json
+      json.scrub('*').to_json
     else
       ''
     end
