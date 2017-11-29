@@ -865,7 +865,8 @@ module JqgridJson
         end
         json.chop! << "]},"
       end
-      json.chop! << "]"
+      json.chop! if count > 0
+      json << "]"
       json << user_data_json(user_data)
       json << "}"
     else
