@@ -496,6 +496,9 @@ module Jqgrid
       context_menu = ""
       if options[:context_menu].size > 0 && !options[:context_menu][:menu_id].blank?
         context_menu = %Q/
+        afterAddRow: function(options){
+          $('#' + options.rowid).contextMenu('#{options[:context_menu][:menu_id]}', #{options[:context_menu][:menu_bindings]});
+        },
         afterInsertRow: function(rowid, rowdata, rowelem){
           $('#' + rowid).contextMenu('#{options[:context_menu][:menu_id]}', #{options[:context_menu][:menu_bindings]});
         },/
@@ -594,6 +597,9 @@ module Jqgrid
         subgrid_context_menu = ""
         if options[:subgrid][:context_menu].size > 0 && !options[:subgrid][:context_menu][:menu_id].blank?
           subgrid_context_menu = %Q/
+          afterAddRow: function(options){
+            $('#' + options.rowid).contextMenu('#{options[:subgrid][:context_menu][:menu_id]}', #{options[:subgrid][:context_menu][:menu_bindings]});
+          },
           afterInsertRow: function(rowid, rowdata, rowelem){
             $('#' + rowid).contextMenu('#{options[:subgrid][:context_menu][:menu_id]}', #{options[:subgrid][:context_menu][:menu_bindings]});
           },/
