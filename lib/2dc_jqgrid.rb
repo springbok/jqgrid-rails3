@@ -14,10 +14,16 @@ module Jqgrid
     end
 
     def jqgrid(title, id, action, columns = [], options = {})
-      
+      # Generate a ransom ID number that we can use as the grids
+      # idprefix which allows us to have multiple grids with the same
+      # data on one page, without this the rows would have the same HTML ID's
+      # causing problems, see rails5_upgrade_issues.txt for more detail
+      Random.new_seed
+      id_number = Time.zone.now.strftime('%M%S').to_i + Random.new.rand(100)
+
       # Default options
-      options = 
-        { 
+      options =
+        {
           :rows_per_page       => '10',
           :sort_column         => '',
           :sort_order          => '',
@@ -26,19 +32,19 @@ module Jqgrid
           # If specified will create a handler using the specified
           # string as the name of the error handler function. Default
           # error handling code will be created for this function.
-          :error_handler       => 'null',  
+          :error_handler       => 'null',
           # The other option is to pass in the name of a custom error handler
           # created external to this plugin, to use this do not specify an
-          # :error_handler option and specify the name of the custom error 
+          # :error_handler option and specify the name of the custom error
           # handler using this option.
           :custom_error_handler=> 'null',
-          :inline_edit_handler => 'null',         
+          :inline_edit_handler => 'null',
           :add                 => 'false',
           :delete              => 'false',
           :search              => 'true',
-          :edit                => 'false',          
-          :view                => 'false',  
-          :refresh             => 'true',        
+          :edit                => 'false',
+          :view                => 'false',
+          :refresh             => 'true',
           :inline_edit         => 'false',
           :autowidth           => 'false',
           :rownumbers          => 'false',
@@ -55,7 +61,7 @@ module Jqgrid
           :cellEdit            => 'false',
 	        # If not a *local* search then it depends on DB, postgres for example is case insensitive when using LIKE
           # so it will ignore this, in docs is says:
-          # By default the *local* searching is case-sensitive. To make the local search and 
+          # By default the *local* searching is case-sensitive. To make the local search and
           # sorting not case-insensitive set this options to true
           :ignoreCase	       => 'true',
           :form_width          => 300,
@@ -74,14 +80,18 @@ module Jqgrid
 	        :searching           => '',
           :guistyle            => 'bootstrap4',
           :iconset             => 'fontAwesome',
+          # make sure row ID's are unique if multiple grids using same data is
+          # used on same page or ID's may conflict
+          # See https://stackoverflow.com/questions/15617575/are-there-row-id-conflicts-when-using-multiple-grids-jqgrid-on-the-same-page
+          :id_prefix           => "#{((id.length > 4) ? id.slice(0, 4) : id)}#{id_number}_",
         }.merge(options)
-      
+
       # Stringify options values
       options.inject({}) do |options, (key, value)|
         options[key] = (key != :subgrid && key != :context_menu) ? value.to_s : value
         options
       end
-      
+
       edit_button = (options[:edit].to_s == 'true' && options[:inline_edit].to_s == 'false').to_s
 
       # beforeShowForm handlers
@@ -187,7 +197,7 @@ module Jqgrid
           options[:error_handler_return_value] = options[:custom_error_handler]
         else
           # Construct default error handler code
-          error_handler_name = options[:error_handler]    
+          error_handler_name = options[:error_handler]
           options[:error_handler_return_value] = options[:error_handler]
           error_handler_code = %Q/function #{options[:error_handler]}(r, data, action) {
             var resText=JSON.parse(r.responseText);
@@ -202,9 +212,9 @@ module Jqgrid
                 return [resText[0],resText[1]]
               }
           }/
-        end        
+        end
       end
-      
+
       # Generate columns data
       col_names, col_model = gen_columns(columns)
 
@@ -250,10 +260,10 @@ module Jqgrid
           end
         end
       end
-     
+
       # Enable sortableRows
       sortableRows=""
-      
+
       # Enable multi-selection (checkboxes)
       multiselect = "multiselect: false,"
       multiselect_handlers = ''
@@ -261,9 +271,9 @@ module Jqgrid
       if options[:multi_selection]
         multiselect = "multiselect: true,"
         multihandler = %Q/
-          jQuery("##{id}_select_button").click(function() { 
-            var s; s = jQuery("##{id}").getGridParam('selarrrow'); 
-            #{options[:selection_handler]}(s); 
+          jQuery("##{id}_select_button").click(function() {
+            var s; s = jQuery("##{id}").getGridParam('selarrrow');
+            #{options[:selection_handler]}(s);
             return false;
           });/
         # Create object to manage cookie array used to store our selections
@@ -442,14 +452,14 @@ module Jqgrid
       selection_link = ""
       if options[:direct_selection].blank? && options[:selection_handler].present? && options[:multi_selection].blank?
         selection_link = %Q/
-        jQuery("##{id}_select_button").click( function(){ 
-          var id = jQuery("##{id}").getGridParam('selrow'); 
-          if (id) { 
-            #{options[:selection_handler]}(id); 
-          } else { 
+        jQuery("##{id}_select_button").click( function(){
+          var id = jQuery("##{id}").getGridParam('selrow');
+          if (id) {
+            #{options[:selection_handler]}(id);
+          } else {
             alert("Please select a row");
           }
-          return false; 
+          return false;
         });/
       end
 
@@ -502,17 +512,17 @@ module Jqgrid
         afterInsertRow: function(rowid, rowdata, rowelem){
           $('#' + rowid).contextMenu('#{options[:context_menu][:menu_id]}', #{options[:context_menu][:menu_bindings]});
         },/
-      end           
-      
+      end
+
       # Enable subgrids
       subgrid = ""
       subgrid_enabled = "subGrid:false,"
 
       if options[:subgrid].present?
-        
+
         subgrid_enabled = "subGrid:true,"
-        
-        options[:subgrid] = 
+
+        options[:subgrid] =
           {
             :rows_per_page => '10',
             :sort_column   => 'id',
@@ -564,30 +574,30 @@ module Jqgrid
           },
          /
         end
-        
+
         subgrid_inline_edit = ""
         if options[:subgrid][:inline_edit] == true
           options[:subgrid][:edit] = 'false'
           subgrid_inline_edit = %Q/
-          onSelectRow: function(id){ 
-            if(id && id!==lastsel){ 
+          onSelectRow: function(id){
+            if(id && id!==lastsel){
               jQuery('#'+subgrid_table_id).restoreRow(lastsel);
-              jQuery('#'+subgrid_table_id).editRow(id,true); 
-              lastsel=id; 
-            } 
+              jQuery('#'+subgrid_table_id).editRow(id,true);
+              lastsel=id;
+            }
           },
           /
         end
-          
+
         if options[:subgrid][:direct_selection] && options[:subgrid][:selection_handler].present?
           subgrid_direct_link = %Q/
-          onSelectRow: function(id){ 
-            if(id){ 
-              #{options[:subgrid][:selection_handler]}(id); 
-            } 
+          onSelectRow: function(id){
+            if(id){
+              #{options[:subgrid][:selection_handler]}(id);
+            }
           },
           /
-        end     
+        end
 
         # Context menu
         # See http://www.trendskitchens.co.nz/jquery/contextmenu/
@@ -606,7 +616,7 @@ module Jqgrid
         end
 
         sub_col_names, sub_col_model = gen_columns(options[:subgrid][:columns])
-        
+
         subgrid = %Q~
         subGridRowExpanded: function(subgrid_id, row_id) {
         		var subgrid_table_id, pager_id;
@@ -615,7 +625,7 @@ module Jqgrid
         		$("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+pager_id+"' class='scroll'></div>");
         		var subgrd = jQuery("#"+subgrid_table_id).jqGrid({
         			url:"#{options[:subgrid][:url]}?q=2&id="+row_id,
-                                editurl:'#{options[:subgrid][:edit_url]}?parent_id='+row_id,                            
+                                editurl:'#{options[:subgrid][:edit_url]}?parent_id='+row_id,
         			datatype: "json",
         			colNames: #{sub_col_names},
         			colModel: #{sub_col_model},
@@ -674,10 +684,11 @@ module Jqgrid
               colNames:#{col_names},
               colModel:#{col_model},
               pager: '##{id}_pager',
-              pagerpos:'#{options[:pagerpos]}', 
+              pagerpos:'#{options[:pagerpos]}',
               rowNum:#{options[:rows_per_page]},
               rowList:#{options[:rowlist]},
               iconSet: '#{options[:iconset]}',
+              idPrefix: '#{options[:id_prefix]}',
               guiStyle: '#{options[:guistyle]}',
               imgpath: '/images/jqgrid',
               viewrecords:#{options[:viewrecords]},
