@@ -391,14 +391,14 @@ module Jqgrid
             ids=0;
             if(jQuery("##{id}_details").getGridParam('records') >0 )
             {
-              jQuery("##{id}_details").setGridParam({url:"#{options[:details_url]}?q=1&id="+ids,page:1})
+              jQuery("##{id}_details").setGridParam({url:"#{options[:details_url]}?q=1&id="+ids.toString().replace('#{options[:id_prefix]}', ''),page:1})
               .setCaption("#{options[:details_caption]}: "+ids)
               .trigger('reloadGrid');
             }
           }
           else
           {
-            jQuery("##{id}_details").setGridParam({url:"#{options[:details_url]}?q=1&id="+ids,page:1})
+            jQuery("##{id}_details").setGridParam({url:"#{options[:details_url]}?q=1&id="+ids.toString().replace('#{options[:id_prefix]}', ''),page:1})
             .setCaption("#{options[:details_caption]} : "+ids)
             .trigger('reloadGrid');
           }
@@ -427,13 +427,13 @@ module Jqgrid
               caption_value = $('##{id}').jqGrid('getCell', ids, '#{grid[:caption_field]}');
               caption = '#{grid[:caption]}';
               if (jQuery.trim(caption).length > 0) { caption = caption + ': '}
-              jQuery("##{grid[:grid_id]}").setGridParam({url:"#{grid[:details_url]}?q=1&id="+ids,page:1})
+              jQuery("##{grid[:grid_id]}").setGridParam({url:"#{grid[:details_url]}?q=1&id="+ids.toString().replace('#{options[:id_prefix]}', ''),page:1})
                 .setCaption(caption+caption_value);
               jQuery("##{grid[:grid_id]}").trigger('reloadGrid');
               ~
             if grid.has_key?(:edit_url)
               grid_methods += %Q~
-                jQuery("##{grid[:grid_id]}").setGridParam({editurl:"#{grid[:edit_url]}?parent_id="+ids});
+                jQuery("##{grid[:grid_id]}").setGridParam({editurl:"#{grid[:edit_url]}?parent_id="+ids.toString().replace('#{options[:id_prefix]}', '')});
                 ~
             end
           end
@@ -624,7 +624,7 @@ module Jqgrid
         		pager_id = "p_"+subgrid_table_id;
         		$("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+pager_id+"' class='scroll'></div>");
         		var subgrd = jQuery("#"+subgrid_table_id).jqGrid({
-        			url:"#{options[:subgrid][:url]}?q=2&id="+row_id,
+        			url:"#{options[:subgrid][:url]}?q=2&id="+row_id.toString().replace('#{options[:id_prefix]}', '');,
                                 editurl:'#{options[:subgrid][:edit_url]}?parent_id='+row_id,
         			datatype: "json",
         			colNames: #{sub_col_names},
