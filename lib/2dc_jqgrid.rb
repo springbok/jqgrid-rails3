@@ -624,7 +624,7 @@ module Jqgrid
         		pager_id = "p_"+subgrid_table_id;
         		$("#"+subgrid_id).html("<table id='"+subgrid_table_id+"' class='scroll'></table><div id='"+pager_id+"' class='scroll'></div>");
         		var subgrd = jQuery("#"+subgrid_table_id).jqGrid({
-        			url:"#{options[:subgrid][:url]}?q=2&id="+row_id.toString().replace('#{options[:id_prefix]}', '');,
+        			url:"#{options[:subgrid][:url]}?q=2&id="+row_id.toString().replace('#{options[:id_prefix]}', ''),
                                 editurl:'#{options[:subgrid][:edit_url]}?parent_id='+row_id,
         			datatype: "json",
         			colNames: #{sub_col_names},
