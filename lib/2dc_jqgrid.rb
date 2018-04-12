@@ -24,6 +24,7 @@ module Jqgrid
       # Default options
       options =
         {
+          :width               => 'null',
           :rows_per_page       => '10',
           :sort_column         => '',
           :sort_order          => '',
@@ -693,6 +694,7 @@ module Jqgrid
               imgpath: '/images/jqgrid',
               viewrecords:#{options[:viewrecords]},
               height: '#{options[:height]}',
+              width: '#{options[:width]}',
               #{"sortname: '#{options[:sort_column]}'," unless options[:sort_column].blank?}
               #{"sortorder: '#{options[:sort_order]}'," unless options[:sort_order].blank?}
               #{"actionsNavOptions: #{options[:actionsNavOptions]}," unless options[:actionsNavOptions].blank?}
