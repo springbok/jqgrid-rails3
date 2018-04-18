@@ -47,6 +47,7 @@ module Jqgrid
           :view                => 'false',
           :refresh             => 'true',
           :inline_edit         => 'false',
+          :autoencode          => 'false',
           :autowidth           => 'false',
           :rownumbers          => 'false',
           :viewrecords         => 'true',
