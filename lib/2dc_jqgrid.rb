@@ -536,7 +536,7 @@ module Jqgrid
             :rowlist       => '[10,25,50,100,200,300]',
             :shrinkToFit   => 'false',
             :form_width    => 300,
-            :autoencode    => false,
+            :autoencode    => 'false',
             :autowidth     => 'false',
             :loadui        => 'enable',
             :footerrow           => 'false',
