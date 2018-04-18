@@ -536,6 +536,7 @@ module Jqgrid
             :rowlist       => '[10,25,50,100,200,300]',
             :shrinkToFit   => 'false',
             :form_width    => 300,
+            :autoencode    => false,
             :autowidth     => 'false',
             :loadui        => 'enable',
             :footerrow           => 'false',
@@ -701,6 +702,7 @@ module Jqgrid
               #{"searching: #{options[:searching]}," unless options[:searching].blank?}
               gridview: #{options[:gridview]},
               scrollrows: true,
+              autoencode: #{options[:autoencode]},
               autowidth: #{options[:autowidth]},
               loadui: '#{options[:loadui]}',
               rownumbers: #{options[:rownumbers]},
