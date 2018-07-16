@@ -86,6 +86,7 @@ module Jqgrid
           # used on same page or ID's may conflict
           # See https://stackoverflow.com/questions/15617575/are-there-row-id-conflicts-when-using-multiple-grids-jqgrid-on-the-same-page
           :id_prefix           => "#{((id.length > 4) ? id.slice(0, 4) : id)}#{id_number}_",
+          :max_height          => 'none'
         }.merge(options)
 
       # Stringify options values
@@ -696,6 +697,7 @@ module Jqgrid
               imgpath: '/images/jqgrid',
               viewrecords:#{options[:viewrecords]},
               height: '#{options[:height]}',
+              maxHeight: '#{options[:max_height]}',
               width: '#{options[:width]}',
               #{"sortname: '#{options[:sort_column]}'," unless options[:sort_column].blank?}
               #{"sortorder: '#{options[:sort_order]}'," unless options[:sort_order].blank?}
