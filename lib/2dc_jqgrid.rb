@@ -141,8 +141,8 @@ module Jqgrid
       grid_loaded = ""
       if options[:grid_loaded].present?
         grid_loaded = %Q/
-        loadComplete: function(){
-          #{options[:grid_loaded]}();
+        loadComplete: function(data){
+          #{options[:grid_loaded]}(data);
         },
         /
       end
