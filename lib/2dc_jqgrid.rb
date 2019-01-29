@@ -75,6 +75,16 @@ module Jqgrid
           :before_show_form_edit => 'null',
           :before_show_form_add  => 'null',
           :before_init_data    => 'null',
+          # onclickPgButtons	This event can be used only when we are in edit mode;
+          # it fires immediately after the previous or next button is clicked,
+          # before leaving the current row, allowing working with (e.g., saving)
+          # the currently loaded values in the form.
+          # onclickPgButtons : function (whichbutton, formid, rowid) {…}
+          # where
+          # whichbutton is either 'prev' or 'next'
+          # formid is the jQuery object of form id, you can use formid[0].id to get form id.
+          # rowid is the id of the current row
+          :onclick_pg_buttons  => 'null',
           :on_close_form       => 'null',
           :group_by            => 'null',
 	        :selectonexpand      => 'true',
@@ -106,6 +116,11 @@ module Jqgrid
       if options[:before_init_data] == 'null'
         # If no error handlers return true
         options[:before_init_data] = 'true;'
+      end
+      # onclickPgButtons handlers
+      if options[:onclick_pg_buttons] == 'null'
+        # If no error handlers return true
+        options[:onclick_pg_buttons] = 'true;'
       end
       if options[:before_show_form_add] == 'null'
         # If no error handlers return true
@@ -544,6 +559,7 @@ module Jqgrid
             :footerrow           => 'false',
             :userDataOnFooter    => 'false',
             :before_init_data => 'null',
+            :onclick_pg_buttons => 'null',
             :before_show_form => 'null',
             :context_menu  => {:menu_bindings => nil, :menu_id => nil},
             :guistyle            => 'bootstrap4',
@@ -561,6 +577,12 @@ module Jqgrid
           # If no error handlers return true
           options[:subgrid][:before_init_data] = 'true;'
         end
+
+        # onclickPgButtons handlers
+       	if options[:subgrid][:onclick_pg_buttons] == 'null'
+           # If no handlers return true
+           options[:subgrid][:onclick_pg_buttons] = 'true;'
+         end
 
       	# beforeShowForm handlers
       	if options[:subgrid][:before_show_form] == 'null'
@@ -659,7 +681,7 @@ module Jqgrid
               {edit:#{options[:subgrid][:edit]},add:#{options[:subgrid][:add]},del:#{options[:subgrid][:delete]},search:false},
               // Edit options
               // *** Set edit & add forms modal to false, if true then it causes all sorts of problems with datepicker and other issues ***
-              {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:subgrid][:form_width]},closeAfterEdit:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'edit');},beforeInitData:function(form){return #{options[:subgrid][:before_init_data]}(form);},beforeShowForm:function(form){return #{options[:subgrid][:before_show_form]}(form);}},
+              {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:subgrid][:form_width]},closeAfterEdit:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'edit');},beforeInitData:function(form){return #{options[:subgrid][:before_init_data]}(form);},beforeShowForm:function(form){return #{options[:subgrid][:before_show_form]}(form);},onclickPgButtons:function(whichbutton, formid, rowid){return #{options[:subgrid][:onclick_pg_buttons]}(whichbutton, formid, rowid);}},
               // Add options
               {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:subgrid][:form_width]},closeAfterAdd:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'add');},beforeInitData:function(form){return #{options[:subgrid][:before_init_data]}(form);},beforeShowForm:function(form){return #{options[:subgrid][:before_show_form]}(form);}},
               // Delete options
@@ -710,8 +732,8 @@ module Jqgrid
               loadui: '#{options[:loadui]}',
               rownumbers: #{options[:rownumbers]},
               hiddengrid: #{options[:hiddengrid]},
-              hidegrid: #{options[:hidegrid]}, 
-              shrinkToFit: #{options[:shrinkToFit]}, 
+              hidegrid: #{options[:hidegrid]},
+              shrinkToFit: #{options[:shrinkToFit]},
               footerrow: #{options[:footerrow]},
               loadonce: #{options[:loadonce]},
 	            ignoreCase: #{options[:ignoreCase]},
@@ -720,7 +742,7 @@ module Jqgrid
               userDataOnFooter: #{options[:userDataOnFooter]},
 	            subGridOptions: {
 		            openicon : "ui-icon-arrowreturn-1-e",
-                selectOnExpand : #{options[:selectonexpand]}, 
+                selectOnExpand : #{options[:selectonexpand]},
 	            },
               loadError: function(xhr, status, error){
                 // Redirect to login page when session expires, see application controller
@@ -743,13 +765,13 @@ module Jqgrid
               #{context_menu}
               #{subgrid_enabled}
               #{subgrid}
-              caption: "#{title}"             
+              caption: "#{title}"
             })
             .navGrid('##{id}_pager',
               {edit:#{edit_button},add:#{options[:add]},del:#{options[:delete]},view:#{options[:view]},search:false,refresh:#{options[:refresh]}},
               // Edit options
               // *** Set edit & add forms modal to false, if true then it causes all sorts of problems with datepicker and other issues ***
-              {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:form_width]},closeAfterEdit:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'edit');},beforeShowForm:function(form){return #{options[:before_show_form_edit]}(form);},onClose:function(form){return #{options[:on_close_form]}(form);},beforeInitData:function(form){return #{options[:before_init_data]}(form);}},
+              {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:form_width]},closeAfterEdit:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'edit');},beforeShowForm:function(form){return #{options[:before_show_form_edit]}(form);},onClose:function(form){return #{options[:on_close_form]}(form);},beforeInitData:function(form){return #{options[:before_init_data]}(form);},onclickPgButtons:function(whichbutton, formid, rowid){return #{options[:onclick_pg_buttons]}(whichbutton, formid, rowid);}},
               // Add options
               {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:form_width]},closeAfterAdd:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'add');},beforeShowForm:function(form){return #{options[:before_show_form_add]}(form);},onClose:function(form){return #{options[:on_close_form]}(form);},beforeInitData:function(form){return #{options[:before_init_data]}(form);}},
               // Delete options
