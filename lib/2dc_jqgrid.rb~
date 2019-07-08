@@ -819,8 +819,6 @@ module Jqgrid
           options << "searchoptions:#{get_sub_options(couple[1])},"
         elsif couple[0] == :editrules
           options << "editrules:#{get_sub_options(couple[1])},"
-        elsif couple[0] == :custom_formatter
-          options << %Q~formatter:#{couple[1]},~
         elsif couple[0] == :cellattr
           options << %Q~#{couple[0]}:#{couple[1]},~
         else
