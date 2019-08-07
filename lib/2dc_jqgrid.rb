@@ -86,6 +86,7 @@ module Jqgrid
           # rowid is the id of the current row
           :onclick_pg_buttons  => 'null',
           :on_close_form       => 'null',
+          :after_show_form     => 'null',
           :group_by            => 'null',
 	        :selectonexpand      => 'true',
 	        :actionsNavOptions   => '',
@@ -128,6 +129,25 @@ module Jqgrid
       end
       if options[:on_close_form] == 'null'
         options[:on_close_form] = 'true;'
+      end
+      # If we have a grid on a bootstrap modal then the add/edit popup's will not
+      # have focus as jqgrid displays the popup using the jquery forms lib. To overcome
+      # this we set focus to the grid using the BS modal methods, on close we also first
+      # hide the modal
+      bootstrap_modal_close = ''
+      bootstrap_modal_focus = ''
+      if !options[:guistyle].blank? && options[:guistyle].include?('bootstrap')
+        bootstrap_modal_close = %Q~
+          console.log('id: ' + form);
+          $(form).modal('hide');
+        ~.html_safe
+        bootstrap_modal_focus = %Q~
+          console.log('id: ' + $('#' + form.attr('id')).parents('.modal').first().attr('id'));
+          $('#' + form.attr('id')).parents('.modal').first().modal({ focus: true });
+        ~.html_safe
+      end
+      if options[:after_show_form] == 'null'
+        options[:after_show_form] = 'true;'
       end
 
       # Enable beforeRequest callback
@@ -771,9 +791,9 @@ module Jqgrid
               {edit:#{edit_button},add:#{options[:add]},del:#{options[:delete]},view:#{options[:view]},search:false,refresh:#{options[:refresh]}},
               // Edit options
               // *** Set edit & add forms modal to false, if true then it causes all sorts of problems with datepicker and other issues ***
-              {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:form_width]},closeAfterEdit:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'edit');},beforeShowForm:function(form){return #{options[:before_show_form_edit]}(form);},onClose:function(form){return #{options[:on_close_form]}(form);},beforeInitData:function(form){return #{options[:before_init_data]}(form);},onclickPgButtons:function(whichbutton, formid, rowid){return #{options[:onclick_pg_buttons]}(whichbutton, formid, rowid);}},
+              {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:form_width]},closeAfterEdit:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'edit');},beforeShowForm:function(form){return #{options[:before_show_form_edit]}(form);},onClose:function(form){#{bootstrap_modal_close}return #{options[:on_close_form]}(form);},afterShowForm:function(form){#{bootstrap_modal_focus}return #{options[:after_show_form]}(form);},beforeInitData:function(form){return #{options[:before_init_data]}(form);},onclickPgButtons:function(whichbutton, formid, rowid){return #{options[:onclick_pg_buttons]}(whichbutton, formid, rowid);}},
               // Add options
-              {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:form_width]},closeAfterAdd:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'add');},beforeShowForm:function(form){return #{options[:before_show_form_add]}(form);},onClose:function(form){return #{options[:on_close_form]}(form);},beforeInitData:function(form){return #{options[:before_init_data]}(form);}},
+              {closeOnEscape:true,modal:false,recreateForm:#{options[:recreateForm]},width:#{options[:form_width]},closeAfterAdd:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'add');},beforeShowForm:function(form){return #{options[:before_show_form_add]}(form);},onClose:function(form){#{bootstrap_modal_close}return #{options[:on_close_form]}(form);},afterShowForm:function(form){#{bootstrap_modal_focus}return #{options[:after_show_form]}(form);},beforeInitData:function(form){return #{options[:before_init_data]}(form);}},
               // Delete options
               {closeOnEscape:true,modal:true,afterSubmit:function(r,data){return #{options[:error_handler_return_value]}(r,data,'delete');}}
             )
