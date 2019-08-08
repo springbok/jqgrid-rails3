@@ -97,7 +97,8 @@ module Jqgrid
           # used on same page or ID's may conflict
           # See https://stackoverflow.com/questions/15617575/are-there-row-id-conflicts-when-using-multiple-grids-jqgrid-on-the-same-page
           :id_prefix           => "#{((id.length > 4) ? id.slice(0, 4) : id)}#{id_number}_",
-          :max_height          => 'none'
+          :max_height          => 'none',
+          :bootstrap_modal_fix => 'false'
         }.merge(options)
 
       # Stringify options values
@@ -136,7 +137,7 @@ module Jqgrid
       # hide the modal
       bootstrap_modal_close = ''
       bootstrap_modal_focus = ''
-      if !options[:guistyle].blank? && options[:guistyle].include?('bootstrap')
+      if options[:bootstrap_modal_fix] == 'true' && !options[:guistyle].blank? && options[:guistyle].include?('bootstrap')
         bootstrap_modal_close = %Q~
           console.log('id: ' + form);
           $(form).modal('hide');
